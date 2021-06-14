@@ -21,8 +21,8 @@ export class Service extends BaseEntity {
     @Column({ name: 'DESCRIPTION', default: '' })
     description: string = '';
 
-    @Column({ name: 'PREFERRED_HOUR', default: '' })
-    preferredHour: string = '';
+    @Column('int', { name: 'PREFERRED_HOUR', array: true, nullable: true })
+    preferredHour: number[];
 
     @Column({ name: 'HOURLY_RATE', default: 0 })
     hourlyRate: number = 0;

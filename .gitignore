@@ -10,9 +10,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-/client/node_module
-/client/yarn.lock
-/client/yarn-error.log
+/front-end/node_module
+/front-end/yarn.lock
+/front-end/yarn-error.log
 # OS
 .DS_Store
 

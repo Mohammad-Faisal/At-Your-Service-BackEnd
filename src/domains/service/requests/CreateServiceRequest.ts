@@ -4,8 +4,6 @@ import { ServiceType } from '../entities/Service';
 import { BaseRequest } from '../../../models/BaseRequest';
 
 export class CreateServiceRequest extends BaseRequest {
-
-
     @ApiModelProperty()
     @IsNotEmpty()
     name: string;
@@ -19,7 +17,7 @@ export class CreateServiceRequest extends BaseRequest {
 
     @ApiModelProperty()
     @IsNotEmpty()
-    preferredHour: string;
+    preferredHour: number[];
 
     @ApiModelProperty()
     @IsNotEmpty()

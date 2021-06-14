@@ -12,6 +12,8 @@ import { GetServiceDetailsResponse } from './responses/GetServiceDetailsResponse
 import { EditServiceRequest } from './requests/EditServiceRequest';
 import { DeleteServiceRequest } from './requests/DeleteServiceRequest';
 import { OrderReviewRepository } from '../order/repositories/order.review.repository';
+import { OrderRepository } from '../order/repositories/order.repository';
+import { OrderStatus } from '../order/entities/Order';
 
 @Injectable()
 export class ServiceService {
@@ -19,6 +21,7 @@ export class ServiceService {
         private readonly userRepository: UserRepository,
         private readonly serviceRepository: ServiceRepository,
         private readonly orderReviewRepository: OrderReviewRepository,
+        private readonly orderRepository: OrderRepository,
     ) {}
 
     async createService(request: CreateServiceRequest): Promise<Result> {
@@ -92,9 +95,26 @@ export class ServiceService {
             totalRating = totalRating + singleReview.rating;
         });
 
+        const offeredServices = await this.serviceRepository.find({
+            where: {
+                provider: provider.id,
+            },
+        });
+
+        const finishedProjects = await this.orderRepository.find({
+            where: {
+                orderTo: provider.id,
+                status: OrderStatus.FINISHED,
+            },
+        });
+
+        response.offeredServices = offeredServices;
+        response.finishedProjects = finishedProjects;
         response.averageRating = totalReview ? totalRating / totalReview : 0.0;
         response.reviews = reviews;
         response.serviceProviderName = provider.name;
+
+        console.log('response is ', response);
 
         return Result.success(response);
     }

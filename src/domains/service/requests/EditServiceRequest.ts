@@ -21,7 +21,7 @@ export class EditServiceRequest extends BaseRequest {
 
     @ApiModelProperty()
     @IsNotEmpty()
-    preferredHour: string;
+    preferredHour: number[];
 
     @ApiModelProperty()
     @IsNotEmpty()
