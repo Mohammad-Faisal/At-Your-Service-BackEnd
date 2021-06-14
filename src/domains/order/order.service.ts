@@ -25,10 +25,6 @@ export class OrderService {
         private readonly orderReviewRepository: OrderReviewRepository,
     ) {}
 
-    async getOrdersOfAService(): Promise<Result> {
-        return Result.success()
-    }
-
     async getOrders(request: GetOrdersRequest): Promise<Result> {
         const filterOptions = {};
         if (request.status) filterOptions['status'] = request.status;
@@ -46,13 +42,12 @@ export class OrderService {
         const provider: User = order.orderTo;
 
         const newOrderReview = new OrderReview();
-        newOrderReview.order=  order;
+        newOrderReview.order = order;
         newOrderReview.review = request.review;
         newOrderReview.rating = request.rating;
-        newOrderReview.reviewFor=  provider;
+        newOrderReview.reviewFor = provider;
         newOrderReview.reviewBy = request.userId;
-        await this.orderReviewRepository.save(newOrderReview)
-
+        await this.orderReviewRepository.save(newOrderReview);
 
         order.rating = request.rating;
         order.review = request.review;
@@ -159,7 +154,7 @@ export class OrderService {
     }
 
     async completeOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
-        console.log(order)
+        console.log(order);
         if (order.status !== OrderStatus.RUNNING) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
         order.status = OrderStatus.COMPLETED;
         order = await this.orderRepository.save(order);
@@ -203,5 +198,10 @@ export class OrderService {
         await this.orderHistoryRepository.save(orderHistory);
 
         return Result.success(order);
+    }
+
+    async getReviews(): Promise<Result> {
+        const reviews = await this.orderReviewRepository.find();
+        return Result.success(reviews);
     }
 }

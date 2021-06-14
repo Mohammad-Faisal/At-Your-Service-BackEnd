@@ -10,6 +10,7 @@ import { SignInRequest } from './requests/SignInRequest';
 import { UserCredential } from './entities/UserCredential';
 import { UserCredentialRepository } from './repositories/user.credential.repository';
 import { JwtTokenService } from '../misc/jwt-token/jwt-token.service';
+import { GetUsersRequest } from './requests/GetUsersRequest';
 
 @Injectable()
 export class UserService {
@@ -19,15 +20,20 @@ export class UserService {
         private readonly userCredentialRepository: UserCredentialRepository,
     ) {}
 
+    async getUsers(request: GetUsersRequest): Promise<Result> {
+        const users = await this.userRepository.find({
+            where: {
+                userType: request.typeOfUser,
+            },
+        });
+        return Result.success(users);
+    }
     async signUp(request: SignUpRequest): Promise<Result> {
         await this.checkIfUserAlreadyExists(request);
         const user = await this.saveUser(request);
         await this.saveUserCredential(user, request);
         const jwtToken = this.generateToken(user);
-        const userAuthenticationResponse = new UsersAuthenticationResponse(
-            user,
-            jwtToken,
-        );
+        const userAuthenticationResponse = new UsersAuthenticationResponse(user, jwtToken);
 
         return Result.success(userAuthenticationResponse);
     }
@@ -45,10 +51,7 @@ export class UserService {
         const userCredential = await this.getUserCredentialFromId(request);
         const user = await this.userRepository.findOne(userCredential.userId);
         const jwtToken = this.generateToken(user);
-        const userAuthenticationResponse = new UsersAuthenticationResponse(
-            user,
-            jwtToken,
-        );
+        const userAuthenticationResponse = new UsersAuthenticationResponse(user, jwtToken);
 
         return Result.success(userAuthenticationResponse);
     }
@@ -61,13 +64,12 @@ export class UserService {
             },
         });
 
-        if (!userCredential)
-            throw new CommonException(ErrorCodes.USER_NOT_FOUND);
+        if (!userCredential) throw new CommonException(ErrorCodes.USER_NOT_FOUND);
         return userCredential;
     }
 
     generateToken = (user: User): string => {
-        return this.jwtTokenService.generateToken(user.name, user.id , user.userType);
+        return this.jwtTokenService.generateToken(user.name, user.id, user.userType);
     };
 
     private async saveUser(request: SignUpRequest) {

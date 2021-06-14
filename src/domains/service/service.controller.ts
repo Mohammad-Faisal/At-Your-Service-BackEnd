@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Put, Res, UseGuards } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { ServiceService } from './service.service';
@@ -8,6 +8,8 @@ import { BaseRequest } from '../../models/BaseRequest';
 import { GetFilteredServicesRequest } from './requests/GetFilteredServicesRequest';
 import { EditServiceRequest } from './requests/EditServiceRequest';
 import { DeleteServiceRequest } from './requests/DeleteServiceRequest';
+import { SuperAdminGuard } from '../../middlewares/super-admin.guard';
+import { ServiceProviderGuard } from '../../middlewares/service-provider.guard';
 
 @ApiTags('Service')
 @ApiHeader({ name: 'authtoken' })
@@ -15,18 +17,21 @@ import { DeleteServiceRequest } from './requests/DeleteServiceRequest';
 export class ServiceController {
     constructor(private serviceService: ServiceService) {}
 
+    @UseGuards(ServiceProviderGuard)
     @Post('create')
     async createNewService(@Body() request: CreateServiceRequest, @Res() response) {
         const result = await this.serviceService.createService(request);
         response.json(new SuccessResponse(result.getValue()));
     }
 
+    @UseGuards(ServiceProviderGuard)
     @Post('update')
     async editService(@Body() request: EditServiceRequest, @Res() response) {
         const result = await this.serviceService.editService(request);
         response.json(new SuccessResponse(result.getValue()));
     }
 
+    @UseGuards(ServiceProviderGuard)
     @Post('delete')
     async deleteService(@Body() request: DeleteServiceRequest, @Res() response) {
         const result = await this.serviceService.deleteService(request);

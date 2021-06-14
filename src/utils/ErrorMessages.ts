@@ -15,6 +15,8 @@ export default class ErrorMessages {
                 return 'Order not found!';
             case ErrorCodes.INVALID_ORDER_STATUS:
                 return 'You can not change the order status now!';
+            case ErrorCodes.UNAUTHORIZED_ACCESS:
+                return 'You are not allowed to use this service!';
             default:
                 return 'Some Error Occurred';
         }

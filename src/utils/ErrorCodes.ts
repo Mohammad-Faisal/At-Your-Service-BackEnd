@@ -6,4 +6,5 @@ export default class ErrorCodes {
     static INVALID_SERVICE = 10004;
     static INVALID_ORDER = 10005;
     static INVALID_ORDER_STATUS = 10006;
+    static UNAUTHORIZED_ACCESS = 10007;
 }
