@@ -1,0 +1,22 @@
+.container-loadingmodal {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    overflow: auto;
+}
+
+.modal-content {
+    height: 100%;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    margin: auto;
+    padding: 20px;
+    width: 100%;
+    z-index: 200;
+    background-attachment: #000000;
+}

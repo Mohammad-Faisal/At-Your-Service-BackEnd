@@ -1,0 +1,11 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "rokkhihome",
+  "password": "rokkhihome",
+  "database": "rokkhihome",
+  "entities": ["dist/**/entities/*{.ts,.js}"],
+  "synchronize": true ,
+  "autoLoadEntities": true
+}
