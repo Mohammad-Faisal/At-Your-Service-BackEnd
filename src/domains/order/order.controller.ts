@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { SuccessResponse } from '../../models/SuccessResponse';
@@ -18,15 +18,15 @@ import { ServiceProviderGuard } from '../../middlewares/service-provider.guard';
 export class OrderController {
     constructor(private orderService: OrderService) {}
 
-    @UseGuards(ServiceProviderGuard)
+    @UseGuards(GeneralUserGuard)
     @Post('place-order')
     async createNewService(@Body() request: PlaceOrderRequest, @Res() response) {
         const result = await this.orderService.placeOrder(request);
         response.json(new SuccessResponse(result.getValue()));
     }
 
-    @Post('get-orders')
-    async getOrders(@Body() request: GetOrdersRequest, @Res() response) {
+    @Get('orders')
+    async getOrders(@Req() request, @Res() response) {
         const result = await this.orderService.getOrders(request);
         response.json(new SuccessResponse(result.getValue()));
     }
@@ -45,7 +45,7 @@ export class OrderController {
     }
 
     @UseGuards(SuperAdminGuard)
-    @Post('get-reviews')
+    @Get('reviews')
     async getReviews(@Body() request: BaseRequest, @Res() response) {
         const result = await this.orderService.getReviews();
         response.json(new SuccessResponse(result.getValue()));

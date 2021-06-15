@@ -6,9 +6,10 @@ import { ServiceRepository } from '../service/repositories/service.repository';
 import { OrderRepository } from './repositories/order.repository';
 import { OrderHistoryRepository } from './repositories/order.history.repository';
 import { OrderReviewRepository } from './repositories/order.review.repository';
+import { JwtTokenModule } from '../misc/jwt-token/jwt-token.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ServiceRepository, OrderRepository, OrderHistoryRepository , OrderReviewRepository])],
+    imports: [JwtTokenModule, TypeOrmModule.forFeature([ServiceRepository, OrderRepository, OrderHistoryRepository, OrderReviewRepository])],
     controllers: [OrderController],
     providers: [OrderService],
 })

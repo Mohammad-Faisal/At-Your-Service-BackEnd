@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Put, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { ServiceService } from './service.service';
@@ -18,29 +18,35 @@ export class ServiceController {
     constructor(private serviceService: ServiceService) {}
 
     @UseGuards(ServiceProviderGuard)
-    @Post('create')
+    @Post()
     async createNewService(@Body() request: CreateServiceRequest, @Res() response) {
         const result = await this.serviceService.createService(request);
         response.json(new SuccessResponse(result.getValue()));
     }
 
     @UseGuards(ServiceProviderGuard)
-    @Post('update')
+    @Patch()
     async editService(@Body() request: EditServiceRequest, @Res() response) {
         const result = await this.serviceService.editService(request);
         response.json(new SuccessResponse(result.getValue()));
     }
 
     @UseGuards(ServiceProviderGuard)
-    @Post('delete')
+    @Delete()
     async deleteService(@Body() request: DeleteServiceRequest, @Res() response) {
         const result = await this.serviceService.deleteService(request);
         response.json(new SuccessResponse(result.getValue()));
     }
 
-    @Post('get-details')
-    async getServiceDetails(@Body() request: DeleteServiceRequest, @Res() response) {
-        const result = await this.serviceService.getServiceDetails(request.id);
+    @Get()
+    async getServices(@Req() request, @Res() response) {
+        const result = await this.serviceService.getServices(request);
+        response.json(new SuccessResponse(result.getValue()));
+    }
+
+    @Get(':id')
+    async getServiceDetails(@Param('id') id: number, @Res() response) {
+        const result = await this.serviceService.getServiceDetails(id);
         response.json(new SuccessResponse(result.getValue()));
     }
 

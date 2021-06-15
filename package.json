@@ -29,6 +29,7 @@
     "@nestjs/typeorm": "^7.1.0",
     "add": "^2.0.6",
     "aws-sdk": "^2.762.0",
+    "bcrypt": "^5.0.1",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "firebase-admin": "^9.2.0",

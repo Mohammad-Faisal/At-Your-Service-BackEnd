@@ -4,25 +4,26 @@ import { UserType } from '../../user/entities/User';
 
 @Injectable()
 export class JwtTokenService {
+    jwt = require('jsonwebtoken');
 
+    constructor(private configService: ConfigService) {}
 
-  jwt = require('jsonwebtoken');
+    generateToken = (userName: string, userId: number, userType: UserType) => {
+        const payload = {
+            userName: userName,
+            userId: userId,
+            userType: userType,
+        };
 
-  constructor(private configService: ConfigService) {}
-
-  generateToken = (userName: string , userId: number , userType: UserType) => {
-
-    const payload = {
-      userName:userName,
-      userId: userId,
-      userType: userType,
+        return this.jwt.sign(payload, this.configService.get('JWT_SECRET'));
     };
 
-    return this.jwt.sign(payload, this.configService.get('JWT_SECRET'));
-  };
+    verifyToken = (token: string) => {
+        return this.jwt.verify(token, this.configService.get('JWT_SECRET'));
+    };
 
-  verifyToken = (token: string) => {
-    return this.jwt.verify(token, this.configService.get('JWT_SECRET'));
-  };
-
+    getUserDetailsFromToken = (token: string) => {
+        const verifiedToken = this.jwt.verify(token, this.configService.get('JWT_SECRET'));
+        return { userType: verifiedToken.userType, userId: verifiedToken.userId };
+    };
 }

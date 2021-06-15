@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Result } from '../../models/Result';
 import { UserRepository } from '../user/repositories/user.repository';
 import { ServiceRepository } from './repositories/service.repository';
@@ -14,10 +14,15 @@ import { DeleteServiceRequest } from './requests/DeleteServiceRequest';
 import { OrderReviewRepository } from '../order/repositories/order.review.repository';
 import { OrderRepository } from '../order/repositories/order.repository';
 import { OrderStatus } from '../order/entities/Order';
+import { BaseRequest } from '../../models/BaseRequest';
+import { JwtPayload } from '../misc/jwt-token/JwtPayload';
+import { JwtTokenService } from '../misc/jwt-token/jwt-token.service';
+import { UserType } from '../user/entities/User';
 
 @Injectable()
 export class ServiceService {
     constructor(
+        private readonly jwtTokenService: JwtTokenService,
         private readonly userRepository: UserRepository,
         private readonly serviceRepository: ServiceRepository,
         private readonly orderReviewRepository: OrderReviewRepository,
@@ -39,7 +44,7 @@ export class ServiceService {
 
     async editService(request: EditServiceRequest): Promise<Result> {
         const oldService = await this.serviceRepository.findOne(request.id);
-        if (!oldService) throw new CommonException(ErrorCodes.INVALID_SERVICE);
+        if (!oldService) throw new CommonException(ErrorCodes.INVALID_SERVICE, HttpStatus.NOT_FOUND);
         oldService.name = request.name;
         oldService.description = request.description;
         oldService.hourlyRate = request.hourlyRate;
@@ -53,9 +58,22 @@ export class ServiceService {
         return Result.success(oldService);
     }
 
+    async getServices(request: any): Promise<Result> {
+        const authToken: string = request.headers.authorization;
+        const jwtToken = authToken.split(' ')[1];
+        const { userType, userId } = this.jwtTokenService.getUserDetailsFromToken(jwtToken as string);
+        if (userType === UserType.SUPER_ADMIN) return this.getAllServices();
+        else return await this.getServicesProvidedByUser(userId);
+    }
+
+    async getAllServices(): Promise<Result> {
+        const services = await this.serviceRepository.find();
+        return Result.success(services);
+    }
+
     async getServicesProvidedByUser(userId: number): Promise<Result> {
         const user = await this.userRepository.findOne(userId);
-        if (!user) throw new CommonException(ErrorCodes.USER_NOT_FOUND);
+        if (!user) throw new CommonException(ErrorCodes.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         const services = await this.serviceRepository.find({
             where: {
@@ -80,6 +98,7 @@ export class ServiceService {
 
     async getServiceDetails(serviceId: number): Promise<Result> {
         const service = await this.serviceRepository.findOne(serviceId);
+        if (!service) throw new CommonException(ErrorCodes.INVALID_SERVICE, HttpStatus.NOT_FOUND);
         const response = new GetServiceDetailsResponse();
         const provider = service.provider;
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceRepository } from '../service/repositories/service.repository';
 import { Result } from '../../models/Result';
 import { Order, OrderStatus } from './entities/Order';
@@ -15,28 +15,32 @@ import { Service } from '../service/entities/Service';
 import { User, UserType } from '../user/entities/User';
 import { OrderReview } from './entities/OrderReview';
 import { OrderReviewRepository } from './repositories/order.review.repository';
+import { JwtTokenService } from '../misc/jwt-token/jwt-token.service';
 
 @Injectable()
 export class OrderService {
     constructor(
+        private readonly jwtTokenService: JwtTokenService,
         private readonly serviceRepository: ServiceRepository,
         private readonly orderRepository: OrderRepository,
         private readonly orderHistoryRepository: OrderHistoryRepository,
         private readonly orderReviewRepository: OrderReviewRepository,
     ) {}
 
-    async getOrders(request: GetOrdersRequest): Promise<Result> {
+    async getOrders(request: any): Promise<Result> {
+        const authToken: string = request.headers.authorization;
+        const jwtToken = authToken.split(' ')[1];
+        const { userType, userId } = this.jwtTokenService.getUserDetailsFromToken(jwtToken as string);
         const filterOptions = {};
-        if (request.status) filterOptions['status'] = request.status;
-        if (request.userType === UserType.GENERAL_USER) filterOptions['orderFrom'] = request.userId;
-        else filterOptions['orderTo'] = request.userId;
+        if (userType === UserType.GENERAL_USER) filterOptions['orderFrom'] = userId;
+        else filterOptions['orderTo'] = userId;
         const orders = await this.orderRepository.find({ where: filterOptions });
         return Result.success(orders);
     }
 
     async giveReview(request: GiveReviewRequest): Promise<Result> {
         let order = await this.orderRepository.findOne(request.orderId);
-        if (!order) throw new CommonException(ErrorCodes.INVALID_ORDER);
+        if (!order) throw new CommonException(ErrorCodes.INVALID_ORDER, HttpStatus.NOT_FOUND);
 
         const service: Service = order.service;
         const provider: User = order.orderTo;
@@ -69,7 +73,7 @@ export class OrderService {
 
     async placeOrder(request: PlaceOrderRequest): Promise<Result> {
         const service = await this.serviceRepository.findOne(request.serviceId);
-        if (!service) throw new CommonException(ErrorCodes.INVALID_SERVICE);
+        if (!service) throw new CommonException(ErrorCodes.INVALID_SERVICE, HttpStatus.NOT_FOUND);
 
         const newOrder = new Order();
 
@@ -93,7 +97,7 @@ export class OrderService {
 
     async changeOrderStatus(request: ChangeOrderStatusRequest): Promise<Result> {
         const order = await this.orderRepository.findOne(request.orderId);
-        if (!order) throw new CommonException(ErrorCodes.INVALID_ORDER);
+        if (!order) throw new CommonException(ErrorCodes.INVALID_ORDER, HttpStatus.NOT_FOUND);
         if (request.changedStatus === OrderStatus.ACCEPTED) {
             return await this.acceptOrder(order, request);
         } else if (request.changedStatus === OrderStatus.REJECTED) {
@@ -107,12 +111,12 @@ export class OrderService {
         } else if (request.changedStatus === OrderStatus.UNFINISHED) {
             return await this.rejectFinishOrder(order, request);
         } else {
-            throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
+            throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.FORBIDDEN);
         }
     }
 
     async acceptOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
-        if (order.status !== OrderStatus.REQUESTED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
+        if (order.status !== OrderStatus.REQUESTED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.NOT_FOUND);
         order.status = OrderStatus.ACCEPTED;
         order = await this.orderRepository.save(order);
 
@@ -126,8 +130,8 @@ export class OrderService {
     }
 
     async rejectOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
-        if (order.status !== OrderStatus.REQUESTED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
-        order.status = OrderStatus.ACCEPTED;
+        if (order.status !== OrderStatus.REQUESTED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.EXPECTATION_FAILED);
+        order.status = OrderStatus.REJECTED;
         order = await this.orderRepository.save(order);
 
         const orderHistory = new OrderHistory();
@@ -140,14 +144,14 @@ export class OrderService {
     }
 
     async startOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
-        if (order.status !== OrderStatus.ACCEPTED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
+        if (order.status !== OrderStatus.ACCEPTED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.EXPECTATION_FAILED);
         order.status = OrderStatus.RUNNING;
         order = await this.orderRepository.save(order);
 
         const orderHistory = new OrderHistory();
         orderHistory.order = order;
         orderHistory.updatedBy = request.userId;
-        orderHistory.description = 'Order status marked as running by custome';
+        orderHistory.description = 'Order status marked as running by customer';
         await this.orderHistoryRepository.save(orderHistory);
 
         return Result.success(order);
@@ -155,7 +159,7 @@ export class OrderService {
 
     async completeOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
         console.log(order);
-        if (order.status !== OrderStatus.RUNNING) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
+        if (order.status !== OrderStatus.RUNNING) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.EXPECTATION_FAILED);
         order.status = OrderStatus.COMPLETED;
         order = await this.orderRepository.save(order);
 
@@ -169,7 +173,7 @@ export class OrderService {
     }
 
     async finishOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
-        if (order.status !== OrderStatus.COMPLETED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
+        if (order.status !== OrderStatus.COMPLETED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.EXPECTATION_FAILED);
         order.status = OrderStatus.FINISHED;
         order = await this.orderRepository.save(order);
 
@@ -187,7 +191,7 @@ export class OrderService {
     }
 
     async rejectFinishOrder(order: Order, request: ChangeOrderStatusRequest): Promise<Result> {
-        if (order.status !== OrderStatus.COMPLETED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS);
+        if (order.status !== OrderStatus.COMPLETED) throw new CommonException(ErrorCodes.INVALID_ORDER_STATUS, HttpStatus.FORBIDDEN);
         order.status = OrderStatus.UNFINISHED;
         order = await this.orderRepository.save(order);
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { User } from './entities/User';
 import { UserRepository } from './repositories/user.repository';
 import { Result } from '../../models/Result';
@@ -12,6 +12,7 @@ import { UserCredentialRepository } from './repositories/user.credential.reposit
 import { JwtTokenService } from '../misc/jwt-token/jwt-token.service';
 import { GetUsersRequest } from './requests/GetUsersRequest';
 
+import bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
     constructor(
@@ -44,7 +45,7 @@ export class UserService {
                 email: request.email,
             },
         });
-        if (oldUser) throw new CommonException(ErrorCodes.USER_ALREADY_EXISTS);
+        if (oldUser) throw new CommonException(ErrorCodes.USER_ALREADY_EXISTS, HttpStatus.AMBIGUOUS);
     }
 
     async signIn(request: SignInRequest): Promise<Result> {
@@ -57,16 +58,23 @@ export class UserService {
     }
 
     private async getUserCredentialFromId(request: SignInRequest) {
+        const hashedPassword = await this.getHashedPassword(request.password);
         const userCredential = await this.userCredentialRepository.findOne({
             where: {
                 email: request.email,
-                password: request.password,
+                password: hashedPassword,
             },
         });
 
-        if (!userCredential) throw new CommonException(ErrorCodes.USER_NOT_FOUND);
+        if (!userCredential) throw new CommonException(ErrorCodes.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         return userCredential;
     }
+
+    getHashedPassword = async password => {
+        const saltRounds = 10;
+        const hash = await bcrypt.hash(password, saltRounds);
+        return hash;
+    };
 
     generateToken = (user: User): string => {
         return this.jwtTokenService.generateToken(user.name, user.id, user.userType);
@@ -82,9 +90,10 @@ export class UserService {
 
     private async saveUserCredential(user: User, request: SignUpRequest) {
         const userCredentialModel = new UserCredential();
+        const hashedPassword = await this.getHashedPassword(request.password);
         userCredentialModel.userId = user.id;
         userCredentialModel.email = request.email;
-        userCredentialModel.password = request.password;
+        userCredentialModel.password = hashedPassword;
         await this.userCredentialRepository.save(userCredentialModel);
     }
 }
