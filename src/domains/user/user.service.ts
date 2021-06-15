@@ -12,7 +12,9 @@ import { UserCredentialRepository } from './repositories/user.credential.reposit
 import { JwtTokenService } from '../misc/jwt-token/jwt-token.service';
 import { GetUsersRequest } from './requests/GetUsersRequest';
 
-import bcrypt from 'bcrypt';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcrypt');
+
 @Injectable()
 export class UserService {
     constructor(

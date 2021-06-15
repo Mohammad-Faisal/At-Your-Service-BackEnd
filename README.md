@@ -43,3 +43,12 @@ yarn start:prod
  7. The environment files can be found under the folder env
 ```
 
+
+car@test.com
+carspecialist
+
+customer1@test.com
+customer1
+
+superadmin@test.com
+superadmin

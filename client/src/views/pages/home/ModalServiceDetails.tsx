@@ -21,7 +21,7 @@ export const ModalServiceDetails: FC<IModalServiceDetails> = ({ serviceId }) => 
     const showModal = () => setVisibility(true);
     return (
         <>
-            <Button onClick={() => showModal()}>{'Details '}</Button>
+            <Button onClick={() => showModal()}>{'Specialist Details '}</Button>
             <Modal title={'Service Provider Details'} visible={visibility} closable={true} footer={null} onCancel={() => setVisibility(false)}>
                 {isLoading ? (
                     <div style={{ height: '150px', display: 'grid', justifyItems: 'center' }}>

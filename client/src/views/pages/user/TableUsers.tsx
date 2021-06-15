@@ -25,10 +25,6 @@ export const TableUsers: FC = () => {
             dataIndex: 'name',
         },
         {
-            title: 'Phone Number',
-            dataIndex: 'phone',
-        },
-        {
             title: 'Email',
             dataIndex: 'email',
         },

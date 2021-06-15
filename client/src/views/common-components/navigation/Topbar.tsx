@@ -18,7 +18,7 @@ export const Topbar: FC = () => {
     return (
         <TopbarContainer>
             <img src={logo} style={{ height: '70px' }} onClick={() => history.push('/home')} />
-            <TopbarTitle> Service Maniac</TopbarTitle>
+            <TopbarTitle> At Your Service</TopbarTitle>
             {/*{userInfo && <h2>Logged In as {userInfo?.data?.name}</h2>}*/}
             {userType === UserType.GENERAL_USER && <Button onClick={() => history.push('/orders')}> Orders </Button>}
             {userType === UserType.UNAUTHENTICATED ? (

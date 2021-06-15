@@ -50,7 +50,7 @@ export const FormFilterService: FC = () => {
 
     return (
         <FormBasicContainer>
-            <FormInputSlider control={control} label={'Rate '} name={'rateRange'} range={[0, 99]} step={1} />
+            <FormInputSlider control={control} label={'Hourly Rate '} name={'rateRange'} range={[0, 99]} step={1} />
             <FormInputSlider control={control} label={'Rating'} name={'ratingRange'} range={[0, 5.0]} step={0.1} />
             <FormInputRadio control={control} label={'Service Type'} name={'type'} type={RadioTypes.SERVICE_TYPE} />
             <FormDoubleContainer>

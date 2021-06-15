@@ -9,7 +9,6 @@ import ErrorCodes from '../../utils/ErrorCodes';
 import { OrderHistory } from './entities/OrderHistory';
 import { OrderHistoryRepository } from './repositories/order.history.repository';
 import { ChangeOrderStatusRequest } from './requests/ChangeOrderStatusRequest';
-import { GetOrdersRequest } from './requests/GetOrdersRequest';
 import { GiveReviewRequest } from './requests/GiveReviewRequest';
 import { Service } from '../service/entities/Service';
 import { User, UserType } from '../user/entities/User';

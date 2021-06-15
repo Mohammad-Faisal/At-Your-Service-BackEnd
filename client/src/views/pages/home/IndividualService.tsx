@@ -14,7 +14,7 @@ import { ServiceType, UserType } from '../../../constants/GeneralConstants';
 import { selectLoggedInUserType } from '../../../store/user/UserSelector';
 import CommonAction from '../../../store/misc/common/CommonAction';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Modal } from 'antd';
+import { Modal, Rate } from 'antd';
 import { ModalServiceDetails } from './ModalServiceDetails';
 const { confirm } = Modal;
 
@@ -51,19 +51,22 @@ export const IndividualService = ({ service }: any) => {
         <ServiceSummaryContainer>
             <img style={{ maxHeight: '250px', width: '100%' }} src={serviceLogo} />
             <ServiceTitle>{service.name} </ServiceTitle>
+
+            <Rate value={service.averageRating} style={{ fontSize: '10px', marginLeft: '10px' }} />
             <ServiceDescription>{service.description} </ServiceDescription>
             <ServiceProviderName>
                 <div> Offered By {service.provider?.name}</div>
                 <ModalServiceDetails serviceId={service.id} />
             </ServiceProviderName>
-            <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', justifyItems: 'space-apart' }}>
-                <ServiceTypeTag>{service.type} </ServiceTypeTag>
-                <ServicePrice>Rate: {service.hourlyRate}$ </ServicePrice>
-            </div>
             <ServicePreferredHour>
                 Preferred hour: {service.preferredHour ? `${service.preferredHour[0]} to ${service.preferredHour[1]}` : 'Not Found'}{' '}
             </ServicePreferredHour>
-            <SubmitButton onClick={orderService}> Order Service </SubmitButton>
+            <div style={{ display: 'grid', alignItems: 'center', gridTemplateColumns: 'auto auto', justifyItems: 'space-apart' }}>
+                <ServiceTypeTag>{service.type} </ServiceTypeTag>
+                <ServicePrice>Rate: {service.hourlyRate}$ </ServicePrice>
+            </div>
+
+            <SubmitButton onClick={orderService}> Request Service </SubmitButton>
         </ServiceSummaryContainer>
     );
 };
@@ -74,7 +77,7 @@ const SubmitButton = styled.button`
     transition: 1000ms;
     color: white;
     margin: 10px;
-    font-size: 20px;
+    font-size: 18px;
     padding: 4px;
     border-radius: 4px;
     &:hover {
@@ -84,12 +87,15 @@ const SubmitButton = styled.button`
 
 const ServicePreferredHour = styled.div`
     font-size: 16px;
+    text-align: start;
+    margin-left: 10px;
 `;
 
 const ServicePrice = styled.div`
     font-size: 24px;
     text-align: end;
     margin-right: 5px;
+    color: #50545c;
 `;
 
 export const ServiceTypeTag = styled.div`
@@ -107,6 +113,7 @@ const ServiceTitle = styled.div`
     font-size: 24px;
     text-align: start;
     margin: 0px 10px;
+    color: #50545c;
     font-weight: bold;
 `;
 
@@ -119,7 +126,7 @@ const ServiceProviderName = styled.div`
 `;
 
 const ServiceDescription = styled.div`
-    font-size: 16px;
+    font-size: 12px;
     text-align: start;
     margin: 0px 10px;
     color: grey;
@@ -130,6 +137,6 @@ const ServiceSummaryContainer = styled.div`
     max-height: 100%;
     border-radius: 4px;
     border: 1px solid #e6e8e7;
-    grid-row-gap: 5px;
+    grid-row-gap: 0px;
     // box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 `;

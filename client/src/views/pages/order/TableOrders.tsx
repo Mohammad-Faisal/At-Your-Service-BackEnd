@@ -8,9 +8,9 @@ import { GetOrdersRequest } from '../../../store/order/requests/GetOrdersRequest
 import { selectOrders } from '../../../store/order/OrderSelector';
 import { OrderStatus, UserType } from '../../../constants/GeneralConstants';
 import { ChangeOrderStatusRequest } from '../../../store/order/requests/ChangeOrderStatusRequest';
-import { ExclamationCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { selectRequesting } from '../../../store/misc/requesting/RequestingSelector';
-import { BarLoader, BeatLoader } from 'react-spinners';
+import { BeatLoader } from 'react-spinners';
 import { TableTitle } from '../../common-components/layout/TableTitle';
 
 const { confirm } = Modal;
