@@ -14,12 +14,12 @@ import { ServiceProviderGuard } from '../../middlewares/service-provider.guard';
 
 @Controller('order')
 @ApiTags('Order')
-@ApiHeader({ name: 'authtoken' })
+@ApiHeader({ name: 'Authorization' })
 export class OrderController {
     constructor(private orderService: OrderService) {}
 
     @UseGuards(GeneralUserGuard)
-    @Post('place-order')
+    @Post('place')
     async createNewService(@Body() request: PlaceOrderRequest, @Res() response) {
         const result = await this.orderService.placeOrder(request);
         response.json(new SuccessResponse(result.getValue()));
@@ -31,7 +31,7 @@ export class OrderController {
         response.json(new SuccessResponse(result.getValue()));
     }
 
-    @Post('change-order-status')
+    @Post('change-status')
     async changeOrderStatus(@Body() request: ChangeOrderStatusRequest, @Res() response) {
         const result = await this.orderService.changeOrderStatus(request);
         response.json(new SuccessResponse(result.getValue()));

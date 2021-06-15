@@ -50,13 +50,7 @@ export class ServiceController {
         response.json(new SuccessResponse(result.getValue()));
     }
 
-    @Post('get-by-user')
-    async getServicesByUser(@Body() request: BaseRequest, @Res() response) {
-        const result = await this.serviceService.getServicesProvidedByUser(request.userId);
-        response.json(new SuccessResponse(result.getValue()));
-    }
-
-    @Post('get-filtered-services')
+    @Post('filter')
     async filterServices(@Body() request: GetFilteredServicesRequest, @Res() response) {
         const result = await this.serviceService.filterServices(request);
         response.json(new SuccessResponse(result.getValue()));
