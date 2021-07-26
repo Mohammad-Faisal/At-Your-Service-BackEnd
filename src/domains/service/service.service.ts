@@ -54,7 +54,9 @@ export class ServiceService {
         return Result.success(service);
     }
     async deleteService(request: DeleteServiceRequest): Promise<Result> {
-        const oldService = await this.serviceRepository.softDelete(request.id);
+        const oldService = await this.serviceRepository.findOne(request.id);
+        if (!oldService) throw new CommonException(ErrorCodes.INVALID_SERVICE, HttpStatus.NOT_FOUND);
+        const result = await this.serviceRepository.softDelete(request.id);
         return Result.success(oldService);
     }
 

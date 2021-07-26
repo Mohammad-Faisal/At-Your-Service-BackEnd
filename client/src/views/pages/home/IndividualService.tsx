@@ -52,7 +52,7 @@ export const IndividualService = ({ service }: any) => {
             <img style={{ maxHeight: '250px', width: '100%' }} src={serviceLogo} />
             <ServiceTitle>{service.name} </ServiceTitle>
 
-            <Rate value={service.averageRating} style={{ fontSize: '10px', marginLeft: '10px' }} />
+            <Rate allowHalf={true} value={service.averageRating} style={{ fontSize: '10px', marginLeft: '10px' }} />
             <ServiceDescription>{service.description} </ServiceDescription>
             <ServiceProviderName>
                 <div> Offered By {service.provider?.name}</div>

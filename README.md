@@ -47,6 +47,9 @@ yarn start:prod
 car@test.com
 carspecialist
 
+cleaning@test.com
+cleaning
+
 customer1@test.com
 customer1
 
