@@ -1,37 +1,5 @@
 ## Description
-This is the backend for Toptal assignment
-
-## Installation
-
-```bash
-yarn install
-```
-
-## Running the app
-
-```bash
-# development
-yarn start
-
-# development watch mode
-yarn start:dev
-
-# production mode
-yarn start:prod
-```
-
-## Common Commands
-```
- # for new module
- $ nest g module new_module
-
- # for new controller
- $ nest g controller new_controller
-
- # for new service
- $ nest g module new_service
-```
-
+This is the backend for a service provider platform where we have used nestjs+postgresql with typescript
 
 ## Use Libraries and Features
 ```
@@ -43,7 +11,7 @@ yarn start:prod
  7. The environment files can be found under the folder env
 ```
 
-
+Some example credentials
 car@test.com
 carspecialist
 
